@@ -1,0 +1,34 @@
+Sub MailMerge2PDF()
+' Macro created by Imnoss Ltd
+' Please share freely while retaining attribution
+' Last Updated 2021-05-03
+    Dim masterDoc As Document, singleDoc As Document, lastRecordNum As Long
+    Set masterDoc = ActiveDocument
+
+    masterDoc.MailMerge.DataSource.ActiveRecord = wdLastRecord
+    lastRecordNum = masterDoc.MailMerge.DataSource.ActiveRecord
+
+    masterDoc.MailMerge.DataSource.ActiveRecord = wdFirstRecord
+    Do While lastRecordNum > 0
+        masterDoc.MailMerge.Destination = wdSendToNewDocument
+        masterDoc.MailMerge.DataSource.FirstRecord = masterDoc.MailMerge.DataSource.ActiveRecord
+        masterDoc.MailMerge.DataSource.LastRecord = masterDoc.MailMerge.DataSource.ActiveRecord
+        masterDoc.MailMerge.Execute False
+        Set singleDoc = ActiveDocument
+        singleDoc.SaveAs2 _
+            FileName:=masterDoc.MailMerge.DataSource.DataFields("LokasiDOC").Value & Application.PathSeparator & _
+                masterDoc.MailMerge.DataSource.DataFields("NamaDOC").Value & ".docx", _
+            FileFormat:=wdFormatXMLDocument
+        singleDoc.ExportAsFixedFormat _
+            OutputFileName:=masterDoc.MailMerge.DataSource.DataFields("LokasiPDF").Value & Application.PathSeparator & _
+                masterDoc.MailMerge.DataSource.DataFields("NamaPDF").Value & ".pdf", _
+            ExportFormat:=wdExportFormatPDF
+        singleDoc.Close False
+        If masterDoc.MailMerge.DataSource.ActiveRecord >= lastRecordNum Then
+            lastRecordNum = 0
+        Else
+            masterDoc.MailMerge.DataSource.ActiveRecord = wdNextRecord
+        End If
+
+    Loop
+End Sub
