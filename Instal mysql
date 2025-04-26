@@ -1,0 +1,3 @@
+cd /www/server/panel/install/
+sed -i 's/download\.bt\.cn/node\.aapanel\.com/g' mysql.sh
+bash mysql.sh install 5.7
